@@ -18,7 +18,7 @@ import { getMinistries, type Ministry } from "@/lib/api";
 export default function HomePage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-  const [ministry, setMinistry] = useState<string>("");
+const [ministry, setMinistry] = useState<string | null>(null);
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ export default function HomePage() {
   useEffect(() => {
     getMinistries()
       .then(setMinistries)
-      .catch(() => setError("Impossible de charger les ministères"));
+      .catch(() => setError("Unable to load ministries"));
   }, []);
 
   function handleSearch(e: React.FormEvent) {
@@ -47,17 +47,17 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-[#1e3a5f]/10 text-[#1e3a5f] rounded-full px-4 py-1.5 text-xs font-medium mb-6">
             <ShieldCheck className="h-3.5 w-3.5" />
-            Registre officiel de vérification
+            Official Verification Register
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-tight">
-            Vérifiez une institution
-            <span className="block text-[#1e3a5f]">en toute confiance</span>
+            Check an institution
+            <span className="block text-[#1e3a5f]">with complete confidence</span>
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Confirmez en quelques secondes si une institution est officiellement
-            autorisée à opérer par le ministère compétent.
+            Confirm in seconds whether an institution is officially authorized
+            to operate by the relevant ministry.
           </p>
 
           {/* Search card */}
@@ -68,16 +68,19 @@ export default function HomePage() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                   <Input
                     type="text"
-                    placeholder="Nom de l'institution..."
+                    placeholder="Institution name or registration number..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="pl-10 h-12 text-base"
                   />
                 </div>
 
-                <Select value={ministry} onValueChange={setMinistry}>
+              <Select
+  value={ministry ?? ""}
+  onValueChange={(value) => setMinistry(value || null)}
+>
                   <SelectTrigger className="h-12 w-full sm:w-64 text-base">
-                    <SelectValue placeholder="Tous les ministères" />
+                    <SelectValue placeholder="All ministries" />
                   </SelectTrigger>
                   <SelectContent>
                     {ministries.map((m) => (
@@ -94,7 +97,7 @@ export default function HomePage() {
                 disabled={loading}
                 className="w-full h-12 bg-[#1e3a5f] hover:bg-[#152c48] text-base font-medium"
               >
-                {loading ? "Recherche..." : "Rechercher une institution"}
+                {loading ? "Searching..." : "Search institutions"}
               </Button>
 
               {error && (
@@ -104,7 +107,7 @@ export default function HomePage() {
           </Card>
 
           <p className="mt-4 text-xs text-slate-400">
-            Aucune inscription requise — Accès libre et gratuit
+            No registration required — Free and open access
           </p>
         </div>
       </section>
@@ -114,34 +117,34 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-              Comment ça marche
+              How it works
             </h2>
             <p className="mt-3 text-slate-600">
-              Trois étapes pour vérifier une institution
+              Three steps to verify an institution
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <FeatureCard
               icon={<Search className="h-6 w-6" />}
-              title="1. Recherchez"
-              description="Entrez le nom de l'institution ou sélectionnez un ministère pour filtrer les résultats."
+              title="1. Search"
+              description="Enter the institution's name or registration number, or select a ministry to filter results."
             />
             <FeatureCard
               icon={<FileCheck className="h-6 w-6" />}
-              title="2. Consultez le statut"
-              description="Visualisez immédiatement si l'institution est autorisée, suspendue ou non reconnue."
+              title="2. Check the status"
+              description="See immediately whether the institution is authorized, suspended, or not recognized."
             />
             <FeatureCard
               icon={<Lock className="h-6 w-6" />}
-              title="3. Décidez en confiance"
-              description="Utilisez ces informations officielles pour prendre une décision éclairée."
+              title="3. Decide with confidence"
+              description="Use this official information to make an informed decision."
             />
           </div>
         </div>
       </section>
 
-      {/* Trust indicators */}
+      {/* Trust section */}
       <section className="py-16 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="rounded-2xl bg-[#1e3a5f] text-white p-8 sm:p-12">
@@ -151,13 +154,12 @@ export default function HomePage() {
               </div>
               <div>
                 <h3 className="text-xl sm:text-2xl font-semibold mb-3">
-                  Une source officielle
+                  An official source
                 </h3>
                 <p className="text-white/80 leading-relaxed">
-                  Les données affichées sur Autorise proviennent directement
-                  des ministères compétents. Nous ne délivrons ni ne modifions
-                  aucune autorisation. Le ministère reste l'unique autorité
-                  décisionnelle.
+                  Data displayed on Autorise comes directly from the competent
+                  ministries. We do not issue or modify any authorizations. The
+                  ministry remains the sole decision-making authority.
                 </p>
               </div>
             </div>

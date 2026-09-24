@@ -45,15 +45,7 @@ export default function RootLayout({
         <span className="tracking-tight">AUTORISE</span>
       </Link>
 
-      {/* Language toggle placeholder — we'll build this properly next */}
-      <div className="flex items-center gap-2 text-sm">
-        <button className="px-2 py-1 rounded font-medium text-[#1e3a5f] bg-[#1e3a5f]/10">
-          FR
-        </button>
-        <button className="px-2 py-1 rounded text-slate-500 hover:text-slate-900">
-          EN
-        </button>
-      </div>
+      {/* No nav links — admin is hidden, public is minimal */}
     </div>
   </div>
 </header>
