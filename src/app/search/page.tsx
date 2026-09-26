@@ -56,28 +56,54 @@ function SearchContent() {
   }, []);
 
   // Load search results whenever search params change
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
+  const [suggestedResults, setSuggestedResults] = useState<Institution[]>([]);
+const [suggestedMinistry, setSuggestedMinistry] = useState<string | null>(null);
 
-    getInstitutions({
-      search: initialSearch || undefined,
-      ministry: initialMinistry || undefined,
-      limit: 50,
+useEffect(() => {
+  setLoading(true);
+  setError(null);
+  setSuggestedResults([]);
+  setSuggestedMinistry(null);
+
+  getInstitutions({
+    search: initialSearch || undefined,
+    ministry: initialMinistry || undefined,
+    limit: 50,
+  })
+    .then(async (res) => {
+      setResults(res.results);
+      setTotal(res.total);
+
+      // If a ministry filter was applied and returned 0 results,
+      // check if the same search matches anything in other ministries.
+      if (res.total === 0 && initialMinistry && initialSearch) {
+        try {
+          const fallback = await getInstitutions({
+            search: initialSearch,
+            limit: 50,
+          });
+
+          if (fallback.total > 0) {
+            setSuggestedResults(fallback.results);
+
+            // Find the distinct ministries in the fallback results
+            const uniqueMinistries = Array.from(
+              new Set(fallback.results.map((r) => r.ministry.name))
+            );
+            setSuggestedMinistry(uniqueMinistries.join(", "));
+          }
+        } catch {
+          // Silently ignore — we already have a valid empty state
+        }
+      }
     })
-      .then((res) => {
-        setResults(res.results);
-        setTotal(res.total);
-      })
-      .catch(() => {
-        setError(
-          "Unable to reach the server. Please try again in a moment."
-        );
-        setResults([]);
-        setTotal(0);
-      })
-      .finally(() => setLoading(false));
-  }, [initialSearch, initialMinistry]);
+    .catch(() => {
+      setError("Unable to reach the server. Please try again in a moment.");
+      setResults([]);
+      setTotal(0);
+    })
+    .finally(() => setLoading(false));
+}, [initialSearch, initialMinistry]);
 
   function handleNewSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -163,9 +189,18 @@ function SearchContent() {
         <LoadingSkeleton />
       ) : error ? (
         <ErrorState message={error} />
-      ) : results.length === 0 ? (
-        <EmptyState searchTerm={initialSearch} />
-      ) : (
+    ) : results.length === 0 ? (
+  suggestedResults.length > 0 ? (
+    <SuggestedMinistriesState
+          searchTerm={initialSearch}
+          currentMinistry={selectedMinistryName || ""}
+          suggestedMinistry={suggestedMinistry || ""}
+          results={suggestedResults}
+        />
+  ) : (
+    <EmptyState searchTerm={initialSearch} />
+  )
+) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {results.map((inst) => (
             <InstitutionCard key={inst.id} institution={inst} />
@@ -317,6 +352,63 @@ function LoadingSkeleton() {
           <div className="h-3 bg-slate-100 rounded w-2/3"></div>
         </Card>
       ))}
+    </div>
+  );
+}
+
+// ---------- Suggested Ministries State ----------
+
+function SuggestedMinistriesState({
+  searchTerm,
+  currentMinistry,
+  suggestedMinistry,
+  results,
+}: {
+  searchTerm: string;
+  currentMinistry: string;
+  suggestedMinistry: string;
+  results: Institution[];
+}) {
+  return (
+    <div className="space-y-4">
+      {/* Explanation card */}
+      <Card className="p-8 bg-amber-50 border-amber-200">
+        <div className="flex items-start gap-4">
+          <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+            <FileWarning className="h-6 w-6 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900 mb-2">
+              Not found in {currentMinistry}
+            </h2>
+            <p className="text-slate-700 leading-relaxed">
+              We found <strong>{results.length}</strong>{" "}
+              {results.length === 1 ? "institution" : "institutions"} matching{" "}
+              <strong>&ldquo;{searchTerm}&rdquo;</strong> in other ministries
+              instead — including{" "}
+              <strong>{suggestedMinistry}</strong>.
+            </p>
+            <p className="text-sm text-slate-600 mt-3">
+              If you were looking for one of these, please change your ministry
+              filter above.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* Show the suggested results */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {results.slice(0, 6).map((inst) => (
+          <InstitutionCard key={inst.id} institution={inst} />
+        ))}
+      </div>
+
+      {results.length > 6 && (
+        <p className="text-center text-sm text-slate-500 mt-4">
+          + {results.length - 6} more results — try searching across all
+          ministries to see them all.
+        </p>
+      )}
     </div>
   );
 }
