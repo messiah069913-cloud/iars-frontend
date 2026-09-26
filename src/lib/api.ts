@@ -36,6 +36,7 @@ export interface Ministry {
 export interface Institution {
   id: string;
   name: string;
+  registrationNumber: string | null;
   location: string | null;
   status: "authorized" | "revoked" | "suspended" | "archived";
   authorizedAt: string | null;

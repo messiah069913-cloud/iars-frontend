@@ -2,23 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search, ShieldCheck, CheckCircle2, Lock, FileCheck } from "lucide-react";
+import {
+  Search,
+  ShieldCheck,
+  CheckCircle2,
+  Lock,
+  FileCheck,
+  ChevronDown,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
 import { getMinistries, type Ministry } from "@/lib/api";
 
 export default function HomePage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
-const [ministry, setMinistry] = useState<string | null>(null);
+  const [ministry, setMinistry] = useState<string | null>(null);
   const [ministries, setMinistries] = useState<Ministry[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +52,9 @@ const [ministry, setMinistry] = useState<string | null>(null);
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-tight">
             Check an institution
-            <span className="block text-[#1e3a5f]">with complete confidence</span>
+            <span className="block text-[#1e3a5f]">
+              with complete confidence
+            </span>
           </h1>
 
           <p className="mt-6 text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -75,21 +77,21 @@ const [ministry, setMinistry] = useState<string | null>(null);
                   />
                 </div>
 
-              <Select
-  value={ministry ?? ""}
-  onValueChange={(value) => setMinistry(value || null)}
->
-                  <SelectTrigger className="h-12 w-full sm:w-64 text-base">
-                    <SelectValue placeholder="All ministries" />
-                  </SelectTrigger>
-                  <SelectContent>
+                <div className="relative w-full sm:w-64">
+                  <select
+                    value={ministry ?? ""}
+                    onChange={(e) => setMinistry(e.target.value || null)}
+                    className="h-12 w-full appearance-none rounded-lg border border-slate-300 bg-white px-4 pr-10 text-base text-slate-900 outline-none focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/20 cursor-pointer"
+                  >
+                    <option value="">All ministries</option>
                     {ministries.map((m) => (
-                      <SelectItem key={m.id} value={m.id}>
+                      <option key={m.id} value={m.id}>
                         {m.name}
-                      </SelectItem>
+                      </option>
                     ))}
-                  </SelectContent>
-                </Select>
+                  </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
+                </div>
               </div>
 
               <Button
