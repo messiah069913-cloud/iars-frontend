@@ -97,7 +97,7 @@ export default function HomePage() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-12 bg-[#1e3a5f] hover:bg-[#152c48] text-base font-medium"
+                className="w-full h-12 bg-[#1e3a5f] hover:bg-[#152c48] text-white text-base font-medium"
               >
                 {loading ? "Searching..." : "Search institutions"}
               </Button>

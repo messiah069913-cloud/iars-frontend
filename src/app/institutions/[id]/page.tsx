@@ -74,32 +74,39 @@ export default function InstitutionDetailPage() {
       </div>
 
       {/* Details grid */}
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <DetailItem
-          icon={<Building2 className="h-4 w-4" />}
-          label="Authorizing Ministry"
-          value={institution.ministry.name}
-        />
-        <DetailItem
-          icon={<MapPin className="h-4 w-4" />}
-          label="Location"
-          value={institution.location || "Not specified"}
-        />
-        <DetailItem
-          icon={<Calendar className="h-4 w-4" />}
-          label="Authorized Since"
-          value={
-            institution.authorizedAt
-              ? formatDate(institution.authorizedAt)
-              : "Not specified"
-          }
-        />
-        <DetailItem
-          icon={<ShieldCheck className="h-4 w-4" />}
-          label="Last Verified"
-          value={formatDate(institution.lastVerifiedAt)}
-        />
-      </div>
+<div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <DetailItem
+    icon={<Building2 className="h-4 w-4" />}
+    label="Authorizing Ministry"
+    value={institution.ministry.name}
+  />
+  <DetailItem
+    icon={<MapPin className="h-4 w-4" />}
+    label="Location"
+    value={institution.location || "Not specified"}
+  />
+  <DetailItem
+    icon={<Calendar className="h-4 w-4" />}
+    label="Authorized Since"
+    value={
+      institution.authorizedAt
+        ? formatDate(institution.authorizedAt)
+        : "Not specified"
+    }
+  />
+  {institution.expiresAt && (
+    <DetailItem
+      icon={<ShieldCheck className="h-4 w-4" />}
+      label="Authorization Expires"
+      value={formatDate(institution.expiresAt)}
+    />
+  )}
+  <DetailItem
+    icon={<ShieldCheck className="h-4 w-4" />}
+    label="Last Verified"
+    value={formatDate(institution.lastVerifiedAt)}
+  />
+</div>
 
       {/* Explanation */}
       <Card className="mt-8 p-6 bg-white border-slate-200">
@@ -150,7 +157,7 @@ export default function InstitutionDetailPage() {
 function StatusBanner({
   status,
 }: {
-  status: "authorized" | "revoked" | "suspended" | "archived";
+  status: "authorized" | "revoked" | "suspended" | "archived" | "pending_renewal" | "expired";
 }) {
   if (status === "authorized") {
     return (
@@ -198,6 +205,53 @@ function StatusBanner({
       </div>
     );
   }
+
+if (status === "pending_renewal") {
+  return (
+    <div className="rounded-2xl bg-amber-50 border-2 border-amber-200 p-6 sm:p-8">
+      <div className="flex items-start gap-4">
+        <div className="h-14 w-14 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+          <PauseCircle className="h-8 w-8 text-amber-600" />
+        </div>
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-amber-700 mb-1">
+            Status
+          </div>
+          <div className="text-2xl sm:text-3xl font-bold text-amber-800">
+            Pending Renewal
+          </div>
+          <p className="mt-2 text-sm text-amber-800/80 leading-relaxed max-w-2xl">
+            This institution&apos;s authorization is expiring soon and is
+            pending renewal by the ministry.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+if (status === "expired") {
+  return (
+    <div className="rounded-2xl bg-red-50 border-2 border-red-200 p-6 sm:p-8">
+      <div className="flex items-start gap-4">
+        <div className="h-14 w-14 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+          <XCircle className="h-8 w-8 text-red-600" />
+        </div>
+        <div>
+          <div className="text-xs font-semibold uppercase tracking-wider text-red-700 mb-1">
+            Status
+          </div>
+          <div className="text-2xl sm:text-3xl font-bold text-red-800">
+            Expired
+          </div>
+          <p className="mt-2 text-sm text-red-800/80 leading-relaxed max-w-2xl">
+            This institution&apos;s authorization period has ended.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="rounded-2xl bg-red-50 border-2 border-red-200 p-6 sm:p-8">
@@ -312,6 +366,10 @@ function formatDate(dateString: string): string {
 
 function statusExplanation(status: string): string {
   switch (status) {
+    case "pending_renewal":
+  return "This institution's authorization is expiring soon. It is pending renewal by the ministry. Please verify with the ministry before proceeding.";
+case "expired":
+  return "This institution's authorization period has ended. It is not currently authorized to operate.";
     case "authorized":
       return "The ministry has confirmed this institution is permitted to operate. You can proceed with confidence.";
     case "suspended":

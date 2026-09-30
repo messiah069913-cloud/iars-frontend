@@ -37,9 +37,17 @@ export interface Institution {
   id: string;
   name: string;
   registrationNumber: string | null;
+  logoUrl: string | null;
   location: string | null;
-  status: "authorized" | "revoked" | "suspended" | "archived";
+  status:
+    | "authorized"
+    | "revoked"
+    | "suspended"
+    | "archived"
+    | "pending_renewal"
+    | "expired";
   authorizedAt: string | null;
+  expiresAt: string | null;
   lastVerifiedAt: string;
   ministry: {
     id: string;

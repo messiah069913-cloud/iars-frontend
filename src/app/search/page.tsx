@@ -177,7 +177,7 @@ useEffect(() => {
           </select>
           <Button
             type="submit"
-            className="h-11 bg-[#1e3a5f] hover:bg-[#152c48] px-6"
+            className="h-11 bg-[#1e3a5f] hover:bg-[#152c48] text-white px-6"
           >
             Search
           </Button>
@@ -216,7 +216,13 @@ useEffect(() => {
 function StatusBadge({
   status,
 }: {
-  status: "authorized" | "revoked" | "suspended" | "archived";
+  status:
+    | "authorized"
+    | "revoked"
+    | "suspended"
+    | "archived"
+    | "pending_renewal"
+    | "expired";
 }) {
   if (status === "authorized") {
     return (
@@ -234,6 +240,23 @@ function StatusBadge({
       </Badge>
     );
   }
+  if (status === "pending_renewal") {
+  return (
+    <Badge className="bg-amber-100 text-amber-800 border border-amber-200 hover:bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+      <PauseCircle className="h-3.5 w-3.5 mr-1" />
+      Pending Renewal
+    </Badge>
+  );
+}
+
+if (status === "expired") {
+  return (
+    <Badge className="bg-red-100 text-red-800 border border-red-200 hover:bg-red-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+      <XCircle className="h-3.5 w-3.5 mr-1" />
+      Expired
+    </Badge>
+  );
+}
   return (
     <Badge className="bg-red-100 text-red-800 border border-red-200 hover:bg-red-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
       <XCircle className="h-3.5 w-3.5 mr-1" />
