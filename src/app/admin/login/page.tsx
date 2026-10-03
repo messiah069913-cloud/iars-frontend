@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { login } from "@/lib/api";
-import { saveSession, isLoggedIn } from "@/lib/admin-auth";
+import { saveSession, isLoggedIn, getUser } from "@/lib/admin-auth";
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -19,10 +19,15 @@ export default function AdminLoginPage() {
 
   // If already logged in, redirect to dashboard
   useEffect(() => {
-    if (isLoggedIn()) {
+  if (isLoggedIn()) {
+    const user = getUser();
+    if (user?.role === "super_admin") {
+      router.replace("/super-admin");
+    } else {
       router.replace("/admin");
     }
-  }, [router]);
+  }
+}, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,8 +36,14 @@ export default function AdminLoginPage() {
 
     try {
       const res = await login(email.trim(), password);
-      saveSession(res.token, res.user);
-      router.replace("/admin");
+saveSession(res.token, res.user);
+
+// Redirect based on role
+if (res.user.role === "super_admin") {
+  router.replace("/super-admin");
+} else {
+  router.replace("/admin");
+}
     } catch (err: unknown) {
       const message =
         (err as { response?: { data?: { error?: string } } })?.response?.data

@@ -158,6 +158,26 @@ export default function AdminDashboardPage() {
               )}
             </p>
           </div>
+          <div className="flex items-center gap-4">
+  {user.role === "super_admin" && (
+    <Link
+      href="/super-admin"
+      className="text-sm text-white/80 hover:text-white transition hidden sm:inline"
+    >
+      ← Super Admin
+    </Link>
+  )}
+  <span className="text-sm text-white/80 hidden sm:inline">
+    {user.name}
+  </span>
+  <button
+    onClick={handleSignOut}
+    className="flex items-center gap-2 text-sm text-white/80 hover:text-white transition"
+  >
+    <LogOut className="h-4 w-4" />
+    Sign out
+  </button>
+</div>
           <Link href="/admin/institutions/new">
             <Button className="bg-[#1e3a5f] hover:bg-[#152c48] text-white">
               <Plus className="h-4 w-4 mr-2" />
@@ -366,6 +386,7 @@ function StatusPill({
     | "expired";
   isActive: boolean;
 }) {
+
   if (!isActive || status === "archived") {
     return (
       <Badge className="bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-100">
@@ -387,6 +408,21 @@ function StatusPill({
       </Badge>
     );
   }
+  if (status === "pending_renewal") {
+  return (
+    <Badge className="bg-amber-100 text-amber-800 border-amber-200 hover:bg-amber-100">
+      Pending Renewal
+    </Badge>
+  );
+}
+
+if (status === "expired") {
+  return (
+    <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">
+      Expired
+    </Badge>
+  );
+}
   return (
     <Badge className="bg-red-100 text-red-800 border-red-200 hover:bg-red-100">
       Revoked
